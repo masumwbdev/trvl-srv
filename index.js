@@ -18,27 +18,22 @@ async function run() {
     try {
         await client.connect();
         const database = client.db('world_travel');
-        const servicesCollection = database.collection('packages');
+        const servicesCollection = database.collection('services');
 
-
+        // get api
+        app.get('/services', async(req, res) => {
+            const cursor = servicesCollection.find({});
+            const services = await cursor.toArray();
+            res.send(services)
+        })
 
         // post api
         app.post('/services', async (req, res) => {
-            const service = {
-                "working": "holiday",
-                "location": "canada",
-                "reviews": 4.9,
-                "totalReviews": 4532,
-                "month": 6,
-                "name": "Mammogram",
-                "price": 453,
-                "viewes": 234,
-                "comments": 23,
-                "description": "Mammography is the process of using low-energy X-rays to examine the human breast for diagnosis and screening. The goal of mammography is the early detection of breast cancer, typically through detection of characteristic masses or microcalcifications.",
-                "imgURL": "https://media.istockphoto.com/photos/happy-best-friends-having-fun-on-a-kayaks-kayaking-on-the-river-picture-id1256457327?b=1&k=20&m=1256457327&s=170667a&w=0&h=FD5pEZkMCLEYx_U2FiNcwFXBWg9vueO33o1bFq44Nv4="
-            }
-            const result = await servicesCollection.insertOne(service);
-            console.log(result)
+            const service = req.body;
+            // console.log('hit the post api')
+            const result = await servicesCollection.insertOne(service)
+            res.json(result)
+            
         })
 
     }
