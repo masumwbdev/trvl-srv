@@ -20,13 +20,37 @@ async function run() {
         await client.connect();
         const database = client.db('world_travel');
         const servicesCollection = database.collection('services');
-        const servicesCollection = database.collection('users')
+        const usersCollection = database.collection('users')
         // get api
         app.get('/services', async (req, res) => {
             const cursor = servicesCollection.find({});
             const services = await cursor.toArray();
             res.send(services)
         })
+
+        // get users
+        app.get('/users', async (req, res) => {
+            const cursor = usersCollection.find({});
+            const users = await cursor.toArray();
+            res.send(users)
+        })
+
+        // get email
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const result = await servicesCollection.find({email:email}).toArray();
+            res.json(result);
+
+        })
+
+        // post users
+        app.post('/users', async (req, res) => {
+            const users = req.body;
+            // console.log('hit users')
+            const result = await usersCollection.insertOne(users);
+            res.json(result);
+        })
+
 
         // get single api
         app.get('/services/:id', async (req, res) => {
@@ -42,6 +66,14 @@ async function run() {
             // console.log('hit the post api')
             const result = await servicesCollection.insertOne(service)
             res.json(result)
+        })
+
+        // delete api
+        app.delete('/users/:id', async(req, res) => {
+            const id = req.params.id;
+            const query = {_id: ObjectId(id)};
+            const result = await usersCollection.deleteOne(query);
+            res.json(result);
         })
 
     }
